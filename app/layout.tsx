@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import './components.css'
 import './portfolio.css'
+import './radar.css'
 
 export const metadata: Metadata = { title: 'Leilões OS', description: 'Investment Operating System para leilões e crescimento patrimonial.' }
 
