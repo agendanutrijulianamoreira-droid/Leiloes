@@ -21,6 +21,17 @@ export interface LocalOpportunityInput {
   firstDate?: string
 }
 
+export interface LocalValuationUpdate {
+  marketBase: number
+  marketConservative: number
+  marketOptimistic: number
+  currentBid: number
+  maxBidAbsolute: number
+  maxBidRecommended: number
+  comfortBid: number
+  baseRoiPct: number
+}
+
 function canUseStorage() {
   return typeof window !== 'undefined' && Boolean(window.localStorage)
 }
@@ -114,6 +125,38 @@ export function createLocalOpportunity(input: LocalOpportunityInput) {
   const next = [opportunity, ...existing]
   saveLocalOpportunities(next)
   return { ok: true as const, opportunity }
+}
+
+export function saveValuationToLocalOpportunity(dealId: string, valuation: LocalValuationUpdate) {
+  const normalized = normalizeDealId(dealId)
+  const existing = loadLocalOpportunities()
+  let updated: AuctionOpportunity | null = null
+
+  const next = existing.map((item) => {
+    if (item.id !== normalized) return item
+
+    const hasValuation = valuation.marketBase > 0 && valuation.maxBidAbsolute > 0
+    updated = {
+      ...item,
+      status: item.status === 'new' || item.status === 'screening' ? 'valuation' : item.status,
+      currentBid: valuation.currentBid,
+      marketBase: Math.round(valuation.marketBase),
+      marketConservative: Math.round(valuation.marketConservative),
+      marketOptimistic: Math.round(valuation.marketOptimistic),
+      maxBidAbsolute: Math.round(valuation.maxBidAbsolute),
+      maxBidRecommended: Math.round(valuation.maxBidRecommended),
+      comfortBid: Math.round(valuation.comfortBid),
+      baseRoiPct: valuation.baseRoiPct,
+      confidence: Math.max(item.confidence, hasValuation ? 45 : item.confidence),
+      mainUpside: hasValuation ? 'Valuation financeiro inicial calculado e salvo no OS.' : item.mainUpside,
+      blockers: item.blockers.filter((blocker) => blocker !== 'Tese ainda depende de valuation.'),
+    }
+    return updated
+  })
+
+  if (!updated) return { ok: false as const, items: existing, opportunity: null }
+  saveLocalOpportunities(next)
+  return { ok: true as const, items: next, opportunity: updated }
 }
 
 export function resetLocalOpportunities() {
