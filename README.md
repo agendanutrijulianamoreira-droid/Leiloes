@@ -46,6 +46,10 @@ Ou rode tudo junto:
 npm run check
 ```
 
+## Deploy
+
+Último ajuste: commit usado para forçar novo deploy na Vercel após correção do export `updateLocalOpportunity`.
+
 ## Futuro
 
 Supabase, autenticação, Gmail, Google Drive, Google Calendar e OpenAI entram depois que o fluxo operacional estiver validado.
