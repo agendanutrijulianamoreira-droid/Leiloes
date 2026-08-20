@@ -10,14 +10,14 @@ export default function Home() {
   const highPriority = opportunities.slice(0, 3)
 
   return (
-    <OSShell title="Visão geral" eyebrow="QUARTA-FEIRA, 19 AGO 2026">
+    <OSShell title="Visão geral" eyebrow="MVP LOCAL-FIRST">
       <div className="hero">
         <div>
           <span className="pill green">● Operação ativa</span>
           <h2>Decisões melhores.<br /><em>Patrimônio maior.</em></h2>
           <p>Um centro de comando para encontrar, analisar e executar oportunidades em leilões com disciplina de risco, valuation e aprovação humana obrigatória.</p>
         </div>
-        <div className="heroMetric"><span>Score médio das oportunidades</span><strong>85<span>/100</span></strong><small>↑ 7,2% vs. mês anterior</small></div>
+        <div className="heroMetric"><span>Score médio das oportunidades</span><strong>85<span>/100</span></strong><small>Base demo para validação</small></div>
       </div>
 
       <div className="metrics">
@@ -41,8 +41,8 @@ export default function Home() {
         <section className="panel">
           <div className="panelHead"><div><span className="eyebrow">AGENDA</span><h3>Próximos marcos</h3></div><CalendarDays size={18} /></div>
           <div className="events">
-            <div><b>22 AGO</b><span><strong>Revisão final</strong>LEILAO-2026-0017 · 10:00</span></div>
-            <div><b>25 AGO</b><span><strong>Leilão</strong>LEILAO-2026-0018 · 14:30</span></div>
+            <div><b>D-3</b><span><strong>Atualizar matrícula/processo</strong>LEILAO-2026-0017</span></div>
+            <div><b>D-1</b><span><strong>Decisão final</strong>LEILAO-2026-0018</span></div>
           </div>
         </section>
       </div>
