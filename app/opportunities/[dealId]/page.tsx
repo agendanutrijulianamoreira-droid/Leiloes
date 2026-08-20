@@ -1,19 +1,21 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { AlertTriangle, CalendarDays, CheckCircle2, Clock, FileText, Gavel, ShieldAlert } from 'lucide-react'
+import { AlertTriangle, CalendarDays, CheckCircle2, Clock, FileText, Gavel, History, ShieldAlert } from 'lucide-react'
 import { OSShell } from '@/components/os-shell'
 import { ValuationSummary } from '@/components/valuation-summary'
 import type { AuctionOpportunity } from '@/lib/domain'
 import type { EditableDiligenceItem } from '@/lib/local-diligence'
 import type { CommitteeMemo } from '@/lib/local-committee'
 import type { LocalCalendarEvent } from '@/lib/local-calendar'
-import { money, statusLabel } from '@/lib/format'
+import type { PostAuctionRecord } from '@/lib/local-post-auction'
+import { money, percent, statusLabel } from '@/lib/format'
 import { getLocalOpportunity } from '@/lib/local-opportunities'
 import { loadLocalDiligence, summarizeDiligence } from '@/lib/local-diligence'
 import { loadCommitteeMemo } from '@/lib/local-committee'
 import { loadCalendarEvents, summarizeCalendar } from '@/lib/local-calendar'
+import { calculatePostAuctionSummary, loadPostAuctionRecord } from '@/lib/local-post-auction'
 
 function formatDateTime(value: string) {
   return new Date(value).toLocaleString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
@@ -24,6 +26,7 @@ export default function OpportunityDetailPage({ params }: { params: { dealId: st
   const [diligence, setDiligence] = useState<EditableDiligenceItem[]>([])
   const [memo, setMemo] = useState<CommitteeMemo | null>(null)
   const [events, setEvents] = useState<LocalCalendarEvent[]>([])
+  const [postAuction, setPostAuction] = useState<PostAuctionRecord | null>(null)
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
@@ -32,8 +35,11 @@ export default function OpportunityDetailPage({ params }: { params: { dealId: st
     setDiligence(loadLocalDiligence(params.dealId))
     setMemo(loadCommitteeMemo(params.dealId))
     setEvents(loadCalendarEvents(params.dealId, loadedOpportunity))
+    setPostAuction(loadPostAuctionRecord(params.dealId, loadedOpportunity))
     setLoaded(true)
   }, [params.dealId])
+
+  const postSummary = useMemo(() => opportunity && postAuction ? calculatePostAuctionSummary(opportunity, postAuction) : null, [opportunity, postAuction])
 
   if (!loaded) {
     return <OSShell title="Carregando" eyebrow={params.dealId}><section className="panel"><p className="panelCopy">Carregando oportunidade...</p></section></OSShell>
@@ -96,6 +102,21 @@ export default function OpportunityDetailPage({ params }: { params: { dealId: st
       </div>
 
       <ValuationSummary opportunity={opportunity} />
+
+      <section className="panel">
+        <div className="panelHead withAction">
+          <div><span className="eyebrow">PÓS-LEILÃO</span><h3>Resultado e aprendizado</h3></div>
+          <Link className="outline" href="/post-auction">Registrar pós-leilão</Link>
+        </div>
+        {postAuction && postSummary ? (
+          <div className="postMiniGrid">
+            <div><span>Resultado</span><strong>{postAuction.outcome === 'won' ? 'Arrematado' : postAuction.outcome === 'lost' ? 'Perdido' : postAuction.outcome === 'not_participated' ? 'Não participou' : 'Pendente'}</strong></div>
+            <div><span>Etapa</span><strong>{postAuction.stage}</strong></div>
+            <div><span>Custo real total</span><strong>{money(postSummary.actualTotalCost)}</strong></div>
+            <div><span>ROI real</span><strong>{percent(postSummary.actualRoiPct)}</strong></div>
+          </div>
+        ) : <div className="emptyState"><History size={15} /> Ainda não há registro de pós-leilão.</div>}
+      </section>
 
       <section className="panel">
         <div className="panelHead withAction">
