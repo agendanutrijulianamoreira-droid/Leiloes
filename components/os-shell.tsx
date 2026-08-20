@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Bell, CalendarDays, CircleDollarSign, FileSearch, Gavel, LayoutDashboard, Plus, Radar, ShieldAlert, Target, Wallet } from 'lucide-react'
+import { Bell, CalendarDays, CircleDollarSign, FileSearch, Gavel, History, LayoutDashboard, Plus, Radar, ShieldAlert, Target, Wallet } from 'lucide-react'
 
 const nav = [
   { label: 'Visão geral', href: '/', icon: LayoutDashboard },
@@ -12,6 +12,7 @@ const nav = [
   { label: 'Valuation', href: '/valuation', icon: CircleDollarSign },
   { label: 'Comitê', href: '/committee', icon: Gavel },
   { label: 'Pré-lance', href: '/pre-lance', icon: ShieldAlert },
+  { label: 'Pós-leilão', href: '/post-auction', icon: History },
   { label: 'Calendário', href: '/calendar', icon: CalendarDays },
   { label: 'Patrimônio', href: '/portfolio', icon: Wallet },
 ]
@@ -40,7 +41,7 @@ export function OSShell({ title, eyebrow, children, action }: { title: string; e
             )
           })}
         </nav>
-        <div className="sidebarBottom"><div className="statusDot" /> Sistema operacional <span>v0.4</span></div>
+        <div className="sidebarBottom"><div className="statusDot" /> Sistema operacional <span>v0.5</span></div>
       </aside>
       <section className="content">
         <header className="topbar">
