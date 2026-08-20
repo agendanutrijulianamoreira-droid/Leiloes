@@ -41,7 +41,7 @@ export function OSShell({ title, eyebrow, children, action }: { title: string; e
             )
           })}
         </nav>
-        <div className="sidebarBottom"><div className="statusDot" /> Sistema operacional <span>v0.5</span></div>
+        <div className="sidebarBottom"><div className="statusDot" /> Sistema operacional <span>v0.6</span></div>
       </aside>
       <section className="content">
         <header className="topbar">
