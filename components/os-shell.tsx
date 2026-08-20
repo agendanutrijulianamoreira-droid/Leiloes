@@ -8,7 +8,7 @@ const nav = [
   { label: 'Visão geral', href: '/', icon: LayoutDashboard },
   { label: 'Radar', href: '/radar', icon: Radar },
   { label: 'Oportunidades', href: '/opportunities', icon: Target },
-  { label: 'Diligência', href: '/opportunities/LEILAO-2026-0017', icon: FileSearch },
+  { label: 'Diligência', href: '/diligence', icon: FileSearch },
   { label: 'Valuation', href: '/valuation', icon: CircleDollarSign },
   { label: 'Pré-lance', href: '/pre-lance', icon: ShieldAlert },
   { label: 'Calendário', href: '/calendar', icon: CalendarDays },
@@ -39,7 +39,7 @@ export function OSShell({ title, eyebrow, children, action }: { title: string; e
             )
           })}
         </nav>
-        <div className="sidebarBottom"><div className="statusDot" /> Sistema operacional <span>v0.2</span></div>
+        <div className="sidebarBottom"><div className="statusDot" /> Sistema operacional <span>v0.3</span></div>
       </aside>
       <section className="content">
         <header className="topbar">
