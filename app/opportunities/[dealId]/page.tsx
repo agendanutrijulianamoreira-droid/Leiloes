@@ -6,16 +6,19 @@ import { AlertTriangle, CalendarDays, CheckCircle2, FileText, ShieldAlert } from
 import { OSShell } from '@/components/os-shell'
 import { ValuationSummary } from '@/components/valuation-summary'
 import type { AuctionOpportunity } from '@/lib/domain'
-import { dueDiligenceItems } from '@/lib/demo-data'
+import type { EditableDiligenceItem } from '@/lib/local-diligence'
 import { money, statusLabel } from '@/lib/format'
 import { getLocalOpportunity } from '@/lib/local-opportunities'
+import { loadLocalDiligence, summarizeDiligence } from '@/lib/local-diligence'
 
 export default function OpportunityDetailPage({ params }: { params: { dealId: string } }) {
   const [opportunity, setOpportunity] = useState<AuctionOpportunity | null>(null)
+  const [diligence, setDiligence] = useState<EditableDiligenceItem[]>([])
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     setOpportunity(getLocalOpportunity(params.dealId))
+    setDiligence(loadLocalDiligence(params.dealId))
     setLoaded(true)
   }, [params.dealId])
 
@@ -36,7 +39,7 @@ export default function OpportunityDetailPage({ params }: { params: { dealId: st
     )
   }
 
-  const diligence = dueDiligenceItems[opportunity.id] ?? []
+  const diligenceSummary = summarizeDiligence(diligence)
 
   return (
     <OSShell title={opportunity.title} eyebrow={opportunity.id}>
@@ -81,10 +84,13 @@ export default function OpportunityDetailPage({ params }: { params: { dealId: st
       <ValuationSummary opportunity={opportunity} />
 
       <section className="panel">
-        <div className="panelHead"><div><span className="eyebrow">DUE DILIGENCE</span><h3>Checklist de diligência</h3></div><CalendarDays size={18} /></div>
+        <div className="panelHead withAction">
+          <div><span className="eyebrow">DUE DILIGENCE</span><h3>Checklist de diligência · {diligenceSummary.completionPct}% concluído</h3></div>
+          <Link className="outline" href="/diligence">Editar diligência</Link>
+        </div>
         <div className="diligenceList">
           {diligence.length ? diligence.map((item) => (
-            <div key={`${item.category}-${item.item}`} className={`diligenceItem ${item.status}`}>
+            <div key={item.id} className={`diligenceItem ${item.status}`}>
               <CheckCircle2 size={16} />
               <div><strong>{item.category} · {item.item}</strong><span>{item.evidence}</span></div>
               <b>{item.risk}</b>
