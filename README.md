@@ -32,6 +32,20 @@ npm run dev
 
 Depois acesse `http://localhost:3000`.
 
+## Validar antes de publicar
+
+```bash
+npm run typecheck
+npm run lint
+npm run build
+```
+
+Ou rode tudo junto:
+
+```bash
+npm run check
+```
+
 ## Futuro
 
 Supabase, autenticação, Gmail, Google Drive, Google Calendar e OpenAI entram depois que o fluxo operacional estiver validado.
