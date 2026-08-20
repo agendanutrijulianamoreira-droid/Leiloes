@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { listOpportunities } from '@/lib/opportunity-repository'
+import { normalizeOpportunityPayload } from '@/lib/opportunity-validation'
 import { getSupabaseServerClient } from '@/lib/supabase-server'
 
 export async function GET() {
@@ -9,8 +10,13 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null)
-  if (!body?.dealId || !body?.title) {
-    return NextResponse.json({ error: 'dealId and title are required' }, { status: 400 })
+  if (!body) {
+    return NextResponse.json({ error: 'Payload inválido.' }, { status: 400 })
+  }
+
+  const { data: payload, errors } = normalizeOpportunityPayload(body)
+  if (errors.length) {
+    return NextResponse.json({ error: 'Dados inválidos.', details: errors }, { status: 400 })
   }
 
   const supabase = getSupabaseServerClient()
@@ -21,12 +27,12 @@ export async function POST(request: Request) {
   const { data: asset, error: assetError } = await supabase
     .from('assets')
     .insert({
-      title: body.title,
-      asset_type: body.assetType ?? 'Ativo',
-      address: body.address ?? null,
-      city: body.city ?? null,
-      state: body.state ?? null,
-      occupancy_status: body.occupancyStatus ?? null,
+      title: payload.title,
+      asset_type: payload.assetType,
+      address: payload.address,
+      city: payload.city,
+      state: payload.state,
+      occupancy_status: payload.occupancyStatus,
     })
     .select('*')
     .single()
@@ -36,14 +42,22 @@ export async function POST(request: Request) {
   const { data: auction, error: auctionError } = await supabase
     .from('auctions')
     .insert({
-      deal_id: body.dealId,
+      deal_id: payload.dealId,
       asset_id: asset.id,
-      auctioneer: body.auctioneer ?? null,
-      source_url: body.sourceUrl ?? null,
-      current_bid: body.currentBid ?? null,
-      opening_bid: body.openingBid ?? body.currentBid ?? null,
-      market_base: body.marketBase ?? null,
+      auctioneer: payload.auctioneer,
+      source_url: payload.sourceUrl,
+      current_bid: payload.currentBid,
+      opening_bid: payload.currentBid,
+      market_conservative: payload.marketConservative,
+      market_base: payload.marketBase,
+      market_optimistic: payload.marketOptimistic,
+      first_date: payload.auctionDate,
       status: 'new',
+      risk: 'medium',
+      confidence: 25,
+      score: 0,
+      decision: 'C_MONITOR',
+      decision_reason: 'Oportunidade recém-cadastrada. Aguardando triagem e documentação.',
     })
     .select('*')
     .single()
