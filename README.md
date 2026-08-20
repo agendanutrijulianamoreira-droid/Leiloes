@@ -4,19 +4,20 @@ Sistema operacional de análise, diligência, valuation, comitê de investimento
 
 ## MVP local-first
 
-Nesta fase o sistema roda sem Supabase. As oportunidades, valuations, diligências, decisões do comitê, marcos de calendário, pós-leilão e snapshots patrimoniais são salvos no `localStorage` do navegador.
+Nesta fase o sistema roda sem Supabase. Radar, oportunidades, valuations, diligências, decisões do comitê, marcos de calendário, pós-leilão e snapshots patrimoniais são salvos no `localStorage` do navegador.
 
 Fluxo principal:
 
-1. `/opportunities/new` — cadastrar oportunidade.
-2. `/diligence` — preencher checklist de diligência.
-3. `/valuation` — calcular preço máximo e cenários.
-4. `/committee` — registrar decisão formal e travas.
-5. `/calendar` — controlar marcos críticos.
-6. `/pre-lance` — visualizar limites finais de lance.
-7. `/post-auction` — registrar resultado, custos reais e aprendizado.
-8. `/portfolio` — consolidar capital, risco, lucro e carteira.
-9. `/opportunities/[dealId]` — consultar ficha-mãe.
+1. `/radar` — cadastrar fontes, leads e oportunidades brutas.
+2. `/opportunities/new` — cadastrar oportunidade manualmente.
+3. `/diligence` — preencher checklist de diligência.
+4. `/valuation` — calcular preço máximo e cenários.
+5. `/committee` — registrar decisão formal e travas.
+6. `/calendar` — controlar marcos críticos.
+7. `/pre-lance` — visualizar limites finais de lance.
+8. `/post-auction` — registrar resultado, custos reais e aprendizado.
+9. `/portfolio` — consolidar capital, risco, lucro e carteira.
+10. `/opportunities/[dealId]` — consultar ficha-mãe.
 
 ## Regra de segurança
 
