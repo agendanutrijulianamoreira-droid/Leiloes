@@ -77,6 +77,22 @@ export function getLocalOpportunity(dealId: string) {
   return loadLocalOpportunities().find((item) => item.id === normalized) ?? null
 }
 
+export function updateLocalOpportunity(dealId: string, patch: Partial<AuctionOpportunity>) {
+  const normalized = normalizeDealId(dealId)
+  const existing = loadLocalOpportunities()
+  let updated: AuctionOpportunity | null = null
+
+  const next = existing.map((item) => {
+    if (item.id !== normalized) return item
+    updated = { ...item, ...patch, id: item.id }
+    return updated
+  })
+
+  if (!updated) return { ok: false as const, items: existing, opportunity: null }
+  saveLocalOpportunities(next)
+  return { ok: true as const, items: next, opportunity: updated }
+}
+
 export function createLocalOpportunity(input: LocalOpportunityInput) {
   const validation = validateLocalOpportunity(input)
   if (!validation.valid) {
