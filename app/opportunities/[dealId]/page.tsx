@@ -2,23 +2,27 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { AlertTriangle, CalendarDays, CheckCircle2, FileText, ShieldAlert } from 'lucide-react'
+import { AlertTriangle, CalendarDays, CheckCircle2, FileText, Gavel, ShieldAlert } from 'lucide-react'
 import { OSShell } from '@/components/os-shell'
 import { ValuationSummary } from '@/components/valuation-summary'
 import type { AuctionOpportunity } from '@/lib/domain'
 import type { EditableDiligenceItem } from '@/lib/local-diligence'
+import type { CommitteeMemo } from '@/lib/local-committee'
 import { money, statusLabel } from '@/lib/format'
 import { getLocalOpportunity } from '@/lib/local-opportunities'
 import { loadLocalDiligence, summarizeDiligence } from '@/lib/local-diligence'
+import { loadCommitteeMemo } from '@/lib/local-committee'
 
 export default function OpportunityDetailPage({ params }: { params: { dealId: string } }) {
   const [opportunity, setOpportunity] = useState<AuctionOpportunity | null>(null)
   const [diligence, setDiligence] = useState<EditableDiligenceItem[]>([])
+  const [memo, setMemo] = useState<CommitteeMemo | null>(null)
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     setOpportunity(getLocalOpportunity(params.dealId))
     setDiligence(loadLocalDiligence(params.dealId))
+    setMemo(loadCommitteeMemo(params.dealId))
     setLoaded(true)
   }, [params.dealId])
 
@@ -82,6 +86,22 @@ export default function OpportunityDetailPage({ params }: { params: { dealId: st
       </div>
 
       <ValuationSummary opportunity={opportunity} />
+
+      <section className="panel">
+        <div className="panelHead withAction">
+          <div><span className="eyebrow">COMITÊ</span><h3>Investment Committee</h3></div>
+          <Link className="outline" href="/committee">Editar decisão</Link>
+        </div>
+        {memo ? (
+          <div className="committeeMemo">
+            <div><span>Decisão</span><strong>{memo.decision}</strong></div>
+            <div><span>Responsável</span><strong>{memo.approvedBy}</strong></div>
+            <div><span>Tese</span><p>{memo.thesis || 'Não informada.'}</p></div>
+            <div><span>Racional</span><p>{memo.rationale || 'Não informado.'}</p></div>
+            {memo.hardBlockers.length > 0 && <div className="blockers committeeBlockers">{memo.hardBlockers.map((blocker) => <div key={blocker}><AlertTriangle size={15} /> {blocker}</div>)}</div>}
+          </div>
+        ) : <div className="emptyState"><Gavel size={15} /> Ainda não há decisão formal do comitê para esta oportunidade.</div>}
+      </section>
 
       <section className="panel">
         <div className="panelHead withAction">
