@@ -2,27 +2,36 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { AlertTriangle, CalendarDays, CheckCircle2, FileText, Gavel, ShieldAlert } from 'lucide-react'
+import { AlertTriangle, CalendarDays, CheckCircle2, Clock, FileText, Gavel, ShieldAlert } from 'lucide-react'
 import { OSShell } from '@/components/os-shell'
 import { ValuationSummary } from '@/components/valuation-summary'
 import type { AuctionOpportunity } from '@/lib/domain'
 import type { EditableDiligenceItem } from '@/lib/local-diligence'
 import type { CommitteeMemo } from '@/lib/local-committee'
+import type { LocalCalendarEvent } from '@/lib/local-calendar'
 import { money, statusLabel } from '@/lib/format'
 import { getLocalOpportunity } from '@/lib/local-opportunities'
 import { loadLocalDiligence, summarizeDiligence } from '@/lib/local-diligence'
 import { loadCommitteeMemo } from '@/lib/local-committee'
+import { loadCalendarEvents, summarizeCalendar } from '@/lib/local-calendar'
+
+function formatDateTime(value: string) {
+  return new Date(value).toLocaleString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+}
 
 export default function OpportunityDetailPage({ params }: { params: { dealId: string } }) {
   const [opportunity, setOpportunity] = useState<AuctionOpportunity | null>(null)
   const [diligence, setDiligence] = useState<EditableDiligenceItem[]>([])
   const [memo, setMemo] = useState<CommitteeMemo | null>(null)
+  const [events, setEvents] = useState<LocalCalendarEvent[]>([])
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
-    setOpportunity(getLocalOpportunity(params.dealId))
+    const loadedOpportunity = getLocalOpportunity(params.dealId)
+    setOpportunity(loadedOpportunity)
     setDiligence(loadLocalDiligence(params.dealId))
     setMemo(loadCommitteeMemo(params.dealId))
+    setEvents(loadCalendarEvents(params.dealId, loadedOpportunity))
     setLoaded(true)
   }, [params.dealId])
 
@@ -44,6 +53,7 @@ export default function OpportunityDetailPage({ params }: { params: { dealId: st
   }
 
   const diligenceSummary = summarizeDiligence(diligence)
+  const calendarSummary = summarizeCalendar(events)
 
   return (
     <OSShell title={opportunity.title} eyebrow={opportunity.id}>
@@ -86,6 +96,22 @@ export default function OpportunityDetailPage({ params }: { params: { dealId: st
       </div>
 
       <ValuationSummary opportunity={opportunity} />
+
+      <section className="panel">
+        <div className="panelHead withAction">
+          <div><span className="eyebrow">CALENDÁRIO</span><h3>Próximos marcos · {calendarSummary.late} atrasados</h3></div>
+          <Link className="outline" href="/calendar">Abrir calendário</Link>
+        </div>
+        <div className="calendarMiniList">
+          {events.filter((event) => event.status !== 'done').slice(0, 3).map((event) => (
+            <div key={event.id} className={`calendarMini ${event.status}`}>
+              <Clock size={15} />
+              <div><strong>{event.title}</strong><span>{formatDateTime(event.dueAt)}</span></div>
+            </div>
+          ))}
+          {!events.length && <div className="emptyState">Sem marcos de calendário para esta oportunidade.</div>}
+        </div>
+      </section>
 
       <section className="panel">
         <div className="panelHead withAction">
