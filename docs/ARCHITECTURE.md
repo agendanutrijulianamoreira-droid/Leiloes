@@ -19,6 +19,11 @@ Radar → Triagem → Diligência → Valuation → Investment Committee → Pr�
 - Legal risk marked critical blocks participation.
 - Financial calculations must expose assumptions and scenarios.
 
+## Database schema
+See `docs/DATABASE_SCHEMA.md` for the full workspace-aware Supabase/Postgres
+schema (`supabase/migrations/20260822010000_leiloes_os_full_schema.sql`),
+its RLS model, and the localStorage → tables migration mapping.
+
 ## Recommended next implementation phases
 1. Supabase schema + authentication.
 2. CRUD for auctions/assets/documents.
