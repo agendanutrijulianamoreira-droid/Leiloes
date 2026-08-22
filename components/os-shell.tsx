@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Archive, Bell, CalendarDays, CircleDollarSign, FileSearch, Gavel, History, LayoutDashboard, Plus, Radar, ShieldAlert, Target, Wallet } from 'lucide-react'
+import { Archive, Bell, CalendarDays, CircleDollarSign, FileSearch, Gavel, History, LayoutDashboard, Plus, Radar, ShieldAlert, Target, UserRound, Wallet } from 'lucide-react'
 
 const nav = [
   { label: 'Visão geral', href: '/', icon: LayoutDashboard },
@@ -16,6 +16,7 @@ const nav = [
   { label: 'Calendário', href: '/calendar', icon: CalendarDays },
   { label: 'Patrimônio', href: '/portfolio', icon: Wallet },
   { label: 'Backup', href: '/backup', icon: Archive },
+  { label: 'Conta', href: '/account', icon: UserRound },
 ]
 
 export function OSShell({ title, eyebrow, children, action }: { title: string; eyebrow?: string; children: React.ReactNode; action?: React.ReactNode }) {
@@ -42,7 +43,7 @@ export function OSShell({ title, eyebrow, children, action }: { title: string; e
             )
           })}
         </nav>
-        <div className="sidebarBottom"><div className="statusDot" /> Sistema operacional <span>v0.7</span></div>
+        <div className="sidebarBottom"><div className="statusDot" /> Sistema operacional <span>v0.8</span></div>
       </aside>
       <section className="content">
         <header className="topbar">
