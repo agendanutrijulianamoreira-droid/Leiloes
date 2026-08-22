@@ -14,6 +14,7 @@ import { loadRadarLeads, summarizeRadar } from '@/lib/local-radar'
 import { loadCalendarEvents } from '@/lib/local-calendar'
 
 const importantStatuses: AuctionStatus[] = ['pre_bid', 'committee', 'valuation', 'due_diligence', 'new']
+const activePostAuctionStatuses: AuctionStatus[] = ['won', 'regularization', 'renovation', 'sale', 'rental']
 
 function formatEventDate(value: string) {
   const date = new Date(value)
@@ -41,7 +42,7 @@ export function OverviewDashboard() {
   }, [])
 
   const snapshot = useMemo(() => loaded ? buildPortfolioSnapshot() : null, [loaded])
-  const radarSummary = useMemo(() => summarizeRadar(loadRadarLeads()), [loaded])
+  const radarSummary = useMemo(() => loaded ? summarizeRadar(loadRadarLeads()) : summarizeRadar([]), [loaded])
   const activeOpportunities = opportunities.filter((item) => !['lost', 'closed', 'rejected'].includes(item.status))
   const priorityOpportunities = [...activeOpportunities].sort((a, b) => priorityScore(b) - priorityScore(a)).slice(0, 3)
   const pendingEvents = events
@@ -54,7 +55,7 @@ export function OverviewDashboard() {
     { label: 'Diligência', count: opportunities.filter((item) => item.status === 'due_diligence').length, href: '/diligence' },
     { label: 'Valuation', count: opportunities.filter((item) => item.status === 'valuation').length, href: '/valuation' },
     { label: 'Pré-lance', count: opportunities.filter((item) => item.status === 'pre_bid').length, href: '/pre-lance' },
-    { label: 'Pós-leilão', count: opportunities.filter((item) => ['won', 'regularization', 'renovation', 'sale', 'rental'].includes(item.status)).length, href: '/post-auction' },
+    { label: 'Pós-leilão', count: opportunities.filter((item) => activePostAuctionStatuses.includes(item.status)).length, href: '/post-auction' },
   ]
 
   if (!loaded || !snapshot) {
@@ -108,7 +109,7 @@ export function OverviewDashboard() {
           <div className="panelHead"><div><span className="eyebrow">AGENDA</span><h3>Próximos marcos</h3></div><CalendarDays size={18} /></div>
           <div className="events">
             {pendingEvents.length ? pendingEvents.map((event) => (
-              <div key={event.id}><b>{formatEventDate(event.dueAt)}</b><span><strong>{event.title}</strong>{event.dealId} · {event.type}</span></div>
+              <div key={event.id}><b>{formatEventDate(event.dueAt)}</b><span><strong>{event.title}</strong>{event.dealId} · {event.kind}</span></div>
             )) : <div className="emptyState">Nenhum marco pendente no calendário local.</div>}
           </div>
         </section>
