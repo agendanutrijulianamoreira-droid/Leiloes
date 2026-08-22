@@ -2,9 +2,11 @@
 
 Sistema operacional de análise, diligência, valuation, comitê de investimento, calendário, pós-leilão e gestão patrimonial de oportunidades em leilões.
 
-## MVP local-first
+## MVP local-first + Supabase bootstrap
 
-Nesta fase o sistema roda sem Supabase. Radar, oportunidades, valuations, diligências, decisões do comitê, marcos de calendário, pós-leilão, snapshots patrimoniais e backups são salvos no `localStorage` do navegador.
+O fluxo operacional ainda roda em modo local-first para não perder velocidade de protótipo. Radar, oportunidades, valuations, diligências, decisões do comitê, marcos de calendário, pós-leilão, snapshots patrimoniais e backups continuam salvos no `localStorage` do navegador.
+
+A base Supabase já começou: `/account` permite validar autenticação, criar workspace e selecionar o `workspace_id` ativo. A migração dos módulos para gravação no banco deve ser feita em etapas, mantendo `localStorage` como fallback.
 
 Fluxo principal:
 
@@ -18,7 +20,20 @@ Fluxo principal:
 8. `/post-auction` — registrar resultado, custos reais e aprendizado.
 9. `/portfolio` — consolidar capital, risco, lucro e carteira.
 10. `/backup` — exportar, importar ou limpar dados locais.
-11. `/opportunities/[dealId]` — consultar ficha-mãe.
+11. `/account` — login Supabase, criação e seleção de workspace.
+12. `/opportunities/[dealId]` — consultar ficha-mãe.
+
+## Supabase
+
+Configure na Vercel ou no `.env.local`:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_DATA_MODE=local
+```
+
+Não exponha `SUPABASE_SERVICE_ROLE_KEY` no front-end. Ela só deve ser usada futuramente em rotas server-side realmente privilegiadas.
 
 ## Regra de segurança
 
@@ -47,10 +62,17 @@ Ou rode tudo junto:
 npm run check
 ```
 
-## Deploy
+## Próxima fase
 
-A versão `v0.7` inclui export/import de backup local para proteger os dados enquanto o Supabase ainda não está ativo.
+Migrar módulo por módulo para Supabase:
 
-## Futuro
+1. Radar.
+2. Oportunidades.
+3. Diligência.
+4. Valuation.
+5. Comitê.
+6. Calendário.
+7. Pós-leilão.
+8. Patrimônio.
 
-Supabase, autenticação, Gmail, Google Drive, Google Calendar e OpenAI entram depois que o fluxo operacional estiver validado.
+Cada módulo deve manter fallback local até a gravação no banco estar validada.
