@@ -4,7 +4,7 @@ Sistema operacional de análise, diligência, valuation, comitê de investimento
 
 ## MVP local-first
 
-Nesta fase o sistema roda sem Supabase. Radar, oportunidades, valuations, diligências, decisões do comitê, marcos de calendário, pós-leilão e snapshots patrimoniais são salvos no `localStorage` do navegador.
+Nesta fase o sistema roda sem Supabase. Radar, oportunidades, valuations, diligências, decisões do comitê, marcos de calendário, pós-leilão, snapshots patrimoniais e backups são salvos no `localStorage` do navegador.
 
 Fluxo principal:
 
@@ -17,7 +17,8 @@ Fluxo principal:
 7. `/pre-lance` — visualizar limites finais de lance.
 8. `/post-auction` — registrar resultado, custos reais e aprendizado.
 9. `/portfolio` — consolidar capital, risco, lucro e carteira.
-10. `/opportunities/[dealId]` — consultar ficha-mãe.
+10. `/backup` — exportar, importar ou limpar dados locais.
+11. `/opportunities/[dealId]` — consultar ficha-mãe.
 
 ## Regra de segurança
 
@@ -48,7 +49,7 @@ npm run check
 
 ## Deploy
 
-Último ajuste: commit usado para forçar novo deploy na Vercel após correção do export `updateLocalOpportunity`.
+A versão `v0.7` inclui export/import de backup local para proteger os dados enquanto o Supabase ainda não está ativo.
 
 ## Futuro
 
