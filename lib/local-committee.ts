@@ -1,6 +1,6 @@
 'use client'
 
-import type { AuctionOpportunity, Decision } from './domain'
+import type { AuctionOpportunity, AuctionStatus, Decision } from './domain'
 import { loadLocalDiligence, summarizeDiligence } from './local-diligence'
 import { getLocalOpportunity, loadLocalOpportunities, saveLocalOpportunities } from './local-opportunities'
 
@@ -63,6 +63,12 @@ export function evaluateCommitteeBlockers(opportunity: AuctionOpportunity) {
   return { blockers, diligenceSummary: summary }
 }
 
+function resolveCommitteeStatus(decision: CommitteeDecision): AuctionStatus {
+  if (decision === 'A — Aprovar' || decision === 'B — Participar até limite') return 'pre_bid'
+  if (decision === 'D — Rejeitar' || decision === 'Bloqueado') return 'rejected'
+  return 'committee'
+}
+
 export function saveCommitteeMemo(input: Omit<CommitteeMemo, 'decidedAt' | 'hardBlockers'>) {
   const opportunity = getLocalOpportunity(input.dealId)
   if (!opportunity) return { ok: false as const, error: 'Oportunidade não encontrada.' }
@@ -81,14 +87,13 @@ export function saveCommitteeMemo(input: Omit<CommitteeMemo, 'decidedAt' | 'hard
   writeAll(allMemos)
 
   const existing = loadLocalOpportunities()
-  const next = existing.map((item) => {
+  const next: AuctionOpportunity[] = existing.map((item): AuctionOpportunity => {
     if (item.id !== keyFor(input.dealId)) return item
     const approved = forcedDecision === 'A — Aprovar' || forcedDecision === 'B — Participar até limite'
-    const rejected = forcedDecision === 'D — Rejeitar' || forcedDecision === 'Bloqueado'
     return {
       ...item,
       decision: forcedDecision,
-      status: approved ? 'pre_bid' : rejected ? 'rejected' : 'committee',
+      status: resolveCommitteeStatus(forcedDecision),
       mainRisk: input.riskNotes || item.mainRisk,
       mainUpside: input.thesis || item.mainUpside,
       blockers: forcedDecision === 'Bloqueado' ? [...new Set([...item.blockers, ...blockers])] : item.blockers,
