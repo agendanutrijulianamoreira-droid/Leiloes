@@ -1,9 +1,37 @@
 # Database schema — Supabase/PostgreSQL
 
-Migration: `supabase/migrations/20260822010000_leiloes_os_full_schema.sql`
-(single file, applied and smoke-tested against PostgreSQL 16 — see
-"Validation" below). `supabase/schema.sql` is the old first draft, kept only
-for history; it is superseded by this migration.
+Migrations:
+- `supabase/migrations/20260822010000_leiloes_os_full_schema.sql` — the
+  schema itself (single file, applied and smoke-tested against PostgreSQL 16
+  — see "Validation" below).
+- `supabase/migrations/20260822011500_harden_function_permissions.sql` —
+  follow-up hardening after Supabase's own security advisor flagged mutable
+  `search_path` and unnecessary `anon`/`authenticated` RPC exposure on
+  internal functions (see "Live project" below).
+
+`supabase/schema.sql` is the old first draft, kept only for history; it is
+superseded by these migrations.
+
+## Live project
+
+Both migrations are applied to a **dedicated** Supabase project —
+`leiloes-os` (`ivspaxowbjwwimpxzqaa`, region `sa-east-1`, free tier). It is
+intentionally separate from the account's other Supabase project
+(`agendanutrijulianamoreira@gmail.com's Project`, `antszuxeairmbctwuafo`),
+which turned out to hold an unrelated nutrition/coaching app's ~136 tables —
+reusing it would have mixed two products' data in the same `public` schema.
+
+To connect the Next.js app, set in `.env` (see `.env.example`; `.env` itself
+must never be committed — see the new root `.gitignore`):
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://ivspaxowbjwwimpxzqaa.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon/publishable key from Supabase dashboard → Project Settings → API>
+```
+
+`SUPABASE_SERVICE_ROLE_KEY` is a secret and was intentionally not pulled
+into this session's output; get it from the same dashboard page if a
+server-side privileged client is needed later.
 
 ## Architecture, in short
 
@@ -46,6 +74,17 @@ for history; it is superseded by this migration.
   the application enforces (mirroring `lib/valuation.ts#classifyBid`); the
   database still needs to store that overshoot to show the blocked state,
   so it isn't a `CHECK` constraint.
+- **Internal functions are not exposed as public RPCs.** Trigger handlers
+  (`fn_set_updated_at`, `fn_audit_log`, `fn_handle_new_*`,
+  `fn_prevent_document_mutation`) and the RLS-policy helpers
+  (`is_workspace_member`, `workspace_role_of`) had their `EXECUTE` grants
+  revoked from `anon`/`authenticated`/`public` — Supabase grants those three
+  roles `EXECUTE` on every new `public` function by default, which would
+  otherwise make each one callable directly via `/rest/v1/rpc/<fn>`.
+  `authenticated` keeps `EXECUTE` only on the two RLS helpers (required for
+  policies to evaluate for signed-in users) and on
+  `fn_opportunity_diligence_completion` (the one function meant to be called
+  from the app).
 
 ## Validation performed
 
