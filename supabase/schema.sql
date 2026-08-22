@@ -1,4 +1,11 @@
 -- Leilões OS initial schema
+--
+-- SUPERSEDED: this file is kept only as a historical record of the first
+-- schema draft. The schema actually used by the app now lives in
+-- supabase/migrations/20260822010000_leiloes_os_full_schema.sql, which adds
+-- workspaces/multi-tenant RLS, full audit trail, valuation/committee
+-- history, calendar, portfolio and AI-report tables. Do not apply this file
+-- to a project that has already run the migration above.
 create extension if not exists pgcrypto;
 
 create type auction_status as enum ('new','screening','due_diligence','valuation','committee','pre_bid','auction','won','lost','regularization','renovation','sale','rental','closed','rejected');
